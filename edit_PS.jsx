@@ -6,7 +6,7 @@ var fileNames = [];
 // if the file starts with a ., skip it
 // if the file is a folder with only 2 files, excluding the .DS_Store file, add it to the list
 for (var i = 0; i < files.length; i++) {
-	if (files[i].name.charAt(0) == ".") 
+	if (files[i].name.charAt(0) == ".")
 		continue;
 	var folder_contents = files[i].getFiles();
 	var number_of_files = 0;
@@ -54,7 +54,9 @@ function Change_Name_and_SaveJpeg(name){
 function Change_Pic(doc, name){
 	var ImageGroup = doc.layerSets.getByName('Main-Pic');
 	var ImageLayer = ImageGroup.layers[0];
-	ImageLayer = replaceContents(doc.path + '/' + name + '.jpg', ImageLayer);
+	ImageLayer = replaceContents(doc.path + '/' + name + '.jpeg', ImageLayer);
+  app.activeDocument.activeLayer = ImageLayer;
+  doAction('Transform', 'Flyers');
 }
 
 function replaceContents(newFile, theSO) {
