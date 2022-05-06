@@ -39,34 +39,48 @@ for (var i = 0; i < fileNames.length; i++) {
 	}
 }
 
-function Change_Name_and_SaveJpeg(name){
+function Change_Name_and_SaveJpeg(name) {
 	var doc = app.activeDocument;
 	var file = new File(doc.path + '/' + name + '.jpg');
 	var titleGroup = doc.layerSets.getByName('Text');
 	var titleLayer = titleGroup.layers.getByName('Name');
 	titleLayer.textItem.contents = name.replace(/%20/g, " ");
-	Change_Pic(doc,name);
+	Change_Pic(doc, name);
 	var opts = new JPEGSaveOptions();
-	opts.quality = 10;
-	doc.saveAs(file,opts,true);
+	// add options to make the file size smaller
+	opts.quality = 6;
+	opts.embedColorProfile = true;
+	opts.formatOptions = FormatOptions.OPTIMIZEDBASELINE;
+	removeXMP();
+	doc.saveAs(file, opts, true, Extension.LOWERCASE);
+	//doc.saveAs(file,opts,true);
 }
 
-function Change_Pic(doc, name){
+function Change_Pic(doc, name) {
 	var ImageGroup = doc.layerSets.getByName('Main-Pic');
 	var ImageLayer = ImageGroup.layers[0];
 	ImageLayer = replaceContents(doc.path + '/' + name + '.jpeg', ImageLayer);
-  app.activeDocument.activeLayer = ImageLayer;
-  doAction('Transform', 'Flyers');
+	app.activeDocument.activeLayer = ImageLayer;
+	doAction('Transform', 'Flyers');
 }
 
 function replaceContents(newFile, theSO) {
-    app.activeDocument.activeLayer = theSO;
-    var idplacedLayerReplaceContents = stringIDToTypeID("placedLayerReplaceContents");
-    var desc3 = new ActionDescriptor();
-    var idnull = charIDToTypeID("null");
-    desc3.putPath(idnull, new File(newFile));
-    var idPgNm = charIDToTypeID("PgNm");
-    desc3.putInteger(idPgNm, 1);
-    executeAction(idplacedLayerReplaceContents, desc3, DialogModes.NO);
-    return app.activeDocument.activeLayer
+	app.activeDocument.activeLayer = theSO;
+	var idplacedLayerReplaceContents = stringIDToTypeID("placedLayerReplaceContents");
+	var desc3 = new ActionDescriptor();
+	var idnull = charIDToTypeID("null");
+	desc3.putPath(idnull, new File(newFile));
+	var idPgNm = charIDToTypeID("PgNm");
+	desc3.putInteger(idPgNm, 1);
+	executeAction(idplacedLayerReplaceContents, desc3, DialogModes.NO);
+	return app.activeDocument.activeLayer
 };
+
+function removeXMP() {
+	if (!documents.length) return;
+	if (ExternalObject.AdobeXMPScript == undefined)
+	ExternalObject.AdobeXMPScript = new ExternalObject("lib:AdobeXMPScript");
+	var xmp = new XMPMeta(activeDocument.xmpMetadata.rawData);
+	XMPUtils.removeProperties(xmp, "", "", XMPConst.REMOVE_ALL_PROPERTIES);
+	app.activeDocument.xmpMetadata.rawData = xmp.serialize();
+}
