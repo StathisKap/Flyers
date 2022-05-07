@@ -2,16 +2,25 @@
 import shutil
 import glob
 import os
+import sys 
 import tkinter.filedialog
 import tkinter as tk
 
-# use tkinter to ask for a directory
-root = tk.Tk()
-root.withdraw()
-# get the directory
-directory = tk.filedialog.askdirectory()
-if directory == "":
+# if the user has provided the f flag, the set directory to the one provided
+if len(sys.argv) > 1 and sys.argv[1] == '-f':
     directory = "/Users/stathis/Pictures/Events/May-10th-Charity-Event/"
+elif len(sys.argv) > 1:
+# if the user has provided a directory, use it
+    directory = sys.argv[1]
+else:
+    root = tk.Tk()
+    root.withdraw()
+    # get the directory
+    directory = tk.filedialog.askdirectory()
+    if directory == "":
+        directory = "/Users/stathis/Pictures/Events/May-10th-Charity-Event/"
+    else:
+        exit()
 
 #directory = '/Users/stathis/Pictures/Events/May-10th-Charity-Event/'
 original = directory + 'Flyer Templates _ Originals/' + 'Ambassadors.psd'
