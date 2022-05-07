@@ -2,7 +2,18 @@
 import shutil
 import glob
 import os
-directory = '/Users/stathis/Pictures/Events/May-10th-Charity-Event/'
+import tkinter.filedialog
+import tkinter as tk
+
+# use tkinter to ask for a directory
+root = tk.Tk()
+root.withdraw()
+# get the directory
+directory = tk.filedialog.askdirectory()
+if directory == "":
+    directory = "/Users/stathis/Pictures/Events/May-10th-Charity-Event/"
+
+#directory = '/Users/stathis/Pictures/Events/May-10th-Charity-Event/'
 original = directory + 'Flyer Templates _ Originals/' + 'Ambassadors.psd'
 names = glob.glob(directory + "*.jpeg")
 
