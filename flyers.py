@@ -17,3 +17,6 @@ for name in names:
     shutil.copyfile(original, target + '.psd')
     shutil.copyfile(name, target + '.jpeg')
     os.remove(name)
+
+# run the edit_PS.jsx script
+os.system("open -a 'Adobe Photoshop 2022' ./edit_PS.jsx")
