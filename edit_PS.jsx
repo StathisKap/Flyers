@@ -2,7 +2,7 @@
 // #################################
 // ######## CHANGE THIS ############
 // #################################
-var directory_path = "/Users/stathis/Pictures/Events/Christmas-Charity-Event/";
+var directory_path = "/Change/This/Path/";
 // #################################
 
 var folder = Folder(directory_path);

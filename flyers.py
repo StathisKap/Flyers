@@ -9,7 +9,7 @@ from tkinter.filedialog import askdirectory
 #################################
 ######## CHANGE THIS ############
 #################################
-default_path = "z"
+default_path = "/Change/This/Path/"
 #################################
 
 print("Select the Folder with the JPEGS", end="\n\n")
