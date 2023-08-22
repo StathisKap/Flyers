@@ -2,10 +2,10 @@
 ---
 ## Setup
 - First add the action file (`Flyers.atn`) to **Photoshop**. Do this by going to Window > Actions (Or hiting Option + F9) and on the window that pops up, click on the 3 lines on the top right corner, and **"Load    Actions"**.
-- Go into the `flyers.py` file and change the variable `default_path` to the path of the the directory with your project.
 - Go into the `edit_PS.jsx` file and change the variable `default_path` to the path of the the directory with your project as well.
 - Make sure the template that you are using has a picture layer that will be getting replaced that is named `Main-Pic` and the text layer named `Name`
 - open up a terminal and run `./setup.py`
+- (Optional) Go into the `flyers.py` file and change the variable `default_path` to the path of the the directory with your project.
 **Done**
 ---
 
