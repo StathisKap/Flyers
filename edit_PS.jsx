@@ -135,13 +135,40 @@ function getFoldersWithoutJpeg(subfolders) {
 /**
  *
  *
+ * 
+ */
+function splitName(inputStr) {
+    // Remove the photo* part
+    var cleanedStr = inputStr.replace(/photo\d+$/, '');
+
+    // Find the position of the first uppercase letter after the '@'
+    var firstUppercasePos = cleanedStr.search(/@[a-z_]+([A-Z])/) + cleanedStr.match(/@[a-z_]+([A-Z])/)[0].length - 1;
+
+    // Split string into handle and name
+    var instaTag = cleanedStr.substring(0, firstUppercasePos);
+
+    // Remove the last underscore from instaTag
+    instaTag = instaTag.substring(0, instaTag.length - 1);
+
+    var name = cleanedStr.substring(firstUppercasePos).replace(/_/g, ' ');
+
+    return [instaTag, name];
+}
+
+
+/**
+ *
+ *
  *
  */
 function Change_Name_and_SaveJpeg(name) {
     var doc = app.activeDocument;
     var file = new File(doc.path + '/' + name + '.jpg');
-    var titleLayer = doc.layers.getByName('Name');
-    titleLayer.textItem.contents = name.replace(/%20/g, " ");
+    result = splitName(name);
+    var nameLayer = doc.layers.getByName('Name');
+    nameLayer.textItem.contents = result[1];
+    var tagLayer = doc.layers.getByName('@insta');
+    tagLayer.textItem.contents = result[0];
     Change_Pic(doc, name);
     var opts = new JPEGSaveOptions();
     // add options to make the file size smaller
