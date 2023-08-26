@@ -58,7 +58,7 @@ var subfolders = folder.getFiles(function (item) {
  * only editing the flyers that haven't completed yet
  */
 var folders = getFoldersWithoutJpeg(subfolders);
-alert("Folder in Dir: \n" + folders.join(', '));
+alert("Folders in Dir: \n" + folders.join(', '));
 
 
 /**
@@ -90,9 +90,13 @@ function processPSDFilesInFolder(folderPath) {
         // Check for PSD files and process them
         if (file.name.toLowerCase().endsWith(".psd")) {
             app.open(file);
-            // file name: ~/Pictures/Events/Crown%20Gala/Animal%20Charity%2026th%20Sept%202023/Ambassadors/@_chloeroberta__Chloe_Roberta/@_chloeroberta__Chloe_Roberta_photo1.psd
+            // file name: /Users/stathis/Pictures/Events/Crown Gala/Animal Charity 26th Sept 2023/Ambassadors/@_chloeroberta_%ChloeRoberta/@_chloeroberta_%ChloeRoberta(1).jpeg
+            // file name: /Users/stathis/Pictures/Events/Crown Gala/Animal Charity 26th Sept 2023/Ambassadors/@kacey.jayne_%Kacey_Jayne/@kacey.jayne_%Kacey_Jayne.jpeg 
             // Make a variable file name, that is just the name of the file without the extension
-            var file_name = file.name.split('/').pop().split('.')[0];
+            var file_name = file.name.split('/').pop()
+            var file_name = file_name.substr(0, file_name.lastIndexOf('.')) || file_name;
+
+            alert("file_name: \n" + file_name)
             Change_Name_and_SaveJpeg(file_name);
             app.activeDocument.close(SaveOptions.SAVECHANGES);
         }
@@ -114,7 +118,6 @@ function getFoldersWithoutJpeg(subfolders) {
         var subfolder = subfolders[i];
 
         // Ignore the "Template" directory
-        alert("subfolder.name: " + subfolder.name)
         if (subfolder.name === "Templates") {
             continue;  // skip to the next iteration of the loop
         }
@@ -124,7 +127,7 @@ function getFoldersWithoutJpeg(subfolders) {
         });
 
         if (filesInSubfolder.length === 0) {
-            fileNamesWithoutJpeg.push(subfolder.name);
+            fileNamesWithoutJpeg.push(decodeURIComponent(subfolder.name));
         }
     }
 
@@ -138,19 +141,27 @@ function getFoldersWithoutJpeg(subfolders) {
  * 
  */
 function splitName(inputStr) {
-    // Remove the photo* part
-    var cleanedStr = inputStr.replace(/photo\d+$/, '');
+    // Remove the file extension
+    var cleanedStr = inputStr.replace(/\.(jpeg|jpg|png)$/, '');
 
-    // Find the position of the first uppercase letter after the '@'
-    var firstUppercasePos = cleanedStr.search(/@[a-z_]+([A-Z])/) + cleanedStr.match(/@[a-z_]+([A-Z])/)[0].length - 1;
+    // Split the string into handle and name by the '%' symbol
+    var splitArr = cleanedStr.split('%');
 
-    // Split string into handle and name
-    var instaTag = cleanedStr.substring(0, firstUppercasePos);
+    // Further process the handle to make it Instagram-friendly
+    var instaTag = splitArr[0];
 
-    // Remove the last underscore from instaTag
-    instaTag = instaTag.substring(0, instaTag.length - 1);
+    // Further process the name to make it human-readable
+    var name = splitArr[1].replace(/_/g, ' ') // Replace '_' with ' '
+                          .replace(/-/g, ' ') // Replace '_' with ' '
+                          .replace(/\(\d+\)/g, '') // Remove '(1)', '(2)', etc.
+                          .replace(/^25/, '') // Remove '25' from the start of the string
+                          .replace(/([a-z])([A-Z])/g, '$1 $2') // Add a space between first and last name 
+                          // Capitalize the first letter of each word
+                          .replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); })
+                          ;
 
-    var name = cleanedStr.substring(firstUppercasePos).replace(/_/g, ' ');
+
+    alert("\ninstaTag: " + instaTag + "\nname: " + name + "\n")
 
     return [instaTag, name];
 }
@@ -186,7 +197,7 @@ function Change_Name_and_SaveJpeg(name) {
  *
  */
 function Change_Pic(doc, name) {
-    alert("Change_Pic - name: " + name)
+    alert("Using Pic: " + name)
     var ImageLayer = doc.layers.getByName('Main-Pic');
     ImageLayer = replaceContents(doc.path + '/' + name + '.jpeg', ImageLayer);
     app.activeDocument.activeLayer = ImageLayer;
@@ -211,7 +222,6 @@ function Change_Pic(doc, name) {
  *
  */
 function replaceContents(newFile, theSO) {
-    alert("reaplaceContents - newFile: " + newFile)
     app.activeDocument.activeLayer = theSO;
     var idplacedLayerReplaceContents = stringIDToTypeID("placedLayerReplaceContents");
     var desc3 = new ActionDescriptor();

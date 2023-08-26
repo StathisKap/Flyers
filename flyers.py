@@ -2,9 +2,11 @@
 import shutil
 import glob
 import os
+import re
 import argparse
 import tkinter as tk
 from tkinter.filedialog import askdirectory
+from PIL import Image
 
 #################################
 ######## CHANGE THIS ############
@@ -45,9 +47,33 @@ def select_directory_with_gui(default):
     return directory
 
 
+def convert_to_jpeg_and_rename(folder_path):
+    for filename in os.listdir(folder_path):
+        # Ensure the file is an image before processing
+        if filename.lower().endswith(('.png', '.jpeg', '.jpg', '.tiff', '.bmp', '.gif')):
+            
+            # Remove spaces, replace '_Picture' with '_photo', and any other required renamings
+            new_filename = filename.replace(" ", "").replace("_Picture", "_photo")
+            
+            # Remove any other extension that might already exist
+            if re.search(r'\.[^_]{3,4}\.[^_]{3,4}$', new_filename):
+                base_name = new_filename.rsplit('.', 2)[0]
+            else:
+                base_name, _ = os.path.splitext(new_filename)
+            jpeg_path = os.path.join(folder_path, base_name + '.jpeg')
+            
+            img_path = os.path.join(folder_path, filename)
+            img = Image.open(img_path)
+            img.save(jpeg_path, "JPEG")
+
+            # If the original name isn't the new name or if the original wasn't saved as a .jpeg, remove the original image
+            if filename != new_filename or not filename.endswith('.jpeg'):
+                os.remove(img_path)
+
 def main():
     parser = argparse.ArgumentParser(description="Process JPEGs in a directory.")
     parser.add_argument("-f", "--folder", help="Use default folder path", action="store_true")
+    parser.add_argument("-l", "--last", help="Use path in data.txt", action="store_true")
     parser.add_argument("directory", nargs="?", default=None, help="Directory containing JPEGs")
     args = parser.parse_args()
 
@@ -55,6 +81,11 @@ def main():
         directory = default_path
     elif args.directory:
         directory = args.directory
+    elif args.last:
+        directory = get_last_path()
+        if not directory:
+            print("No last path found. Exiting.")
+            return
     else:
         directory = select_directory_with_gui(default_path)
 
@@ -65,21 +96,26 @@ def main():
     if not directory.endswith("/"):
         directory += "/"
 
+    ##### Converting all the images #####
+    convert_to_jpeg_and_rename(directory)
+
     original = directory + 'Templates/Template.psd'
-    names = glob.glob(directory + "*.jpeg") + glob.glob(directory + "*.jpg")
+    names = glob.glob(directory + "*.jpeg")
     print(f"\nDIR Selected: '{directory}'")
     print(f"Using Template: '{original}'\n")
     print(f"Found {len(names)} Pictures\n")
 
     for name in names:
         ##### Determine the extension ##### 
-        ext = '.jpeg' if name.endswith('.jpeg') else '.jpg'
+        ext = '.jpeg'
 
         ##### Extract path without extension #####
         path_without_ext = name.rsplit(ext, 1)[0]
 
         ##### Extract ambassador name by cutting off the '_photo' part #####
-        Ambassador_name = os.path.basename(path_without_ext.rsplit('_photo', 1)[0])
+        # Ambassador_name = os.path.basename(path_without_ext.rsplit('_photo', 1)[0])
+        ##### Remove any (1), (2), (3) etc. #####
+        Ambassador_name = re.sub(r'\(\d+\)', '', path_without_ext)
         print(f"Ambassador: {Ambassador_name}")
 
         ##### Create a directory for the ambassador if it doesn't exist #####
