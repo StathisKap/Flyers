@@ -47,7 +47,11 @@ if (!String.prototype.endsWith) {
 alert("Working Dir:\n" + directory_path);
 var folder = Folder(directory_path);
 var subfolders = folder.getFiles(function (item) {
-    return (item instanceof Folder && !item.name.startsWith('.'));
+    if (item instanceof Folder && !item.name.startsWith('.')) {
+        item.name = item.name;
+        return true;
+    }
+    return false;
 });
 
 /**
@@ -58,7 +62,7 @@ var subfolders = folder.getFiles(function (item) {
  * only editing the flyers that haven't completed yet
  */
 var folders = getFoldersWithoutJpeg(subfolders);
-alert("Folders in Dir: \n" + folders.join(', '));
+alert("Folders in Dir: \n" + folders.join(',\n'));
 
 
 /**
@@ -70,6 +74,7 @@ for (var i = 0; i < folders.length; i++) {
     var folder = folders[i];
     processPSDFilesInFolder(directory_path + folder);
 }
+alert("Done!")
 
 
 /**
@@ -78,8 +83,26 @@ for (var i = 0; i < folders.length; i++) {
  *
  */
 function processPSDFilesInFolder(folderPath) {
-    var folder = Folder(folderPath);
+    var folder = Folder(encodeURIComponent(folderPath));
     var files = folder.getFiles();
+    /**
+     *
+     *
+     * 
+     */
+    //  var baseNames = []; // Just used for printing out the names of the files
+    //  for (var i = 0; i < files.length; i++) {
+    //      var file = files[i];
+    //      var baseName = file.name;  // This gets you just the filename part
+    //      baseNames.push(baseName);
+    //  }
+     
+    //  alert("Base names of files: \n" + baseNames.join('\n'));
+    /**
+     *
+     *
+     * 
+     */
 
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
@@ -96,7 +119,7 @@ function processPSDFilesInFolder(folderPath) {
             var file_name = file.name.split('/').pop()
             var file_name = file_name.substr(0, file_name.lastIndexOf('.')) || file_name;
 
-            alert("file_name: \n" + file_name)
+            // alert("file_name: \n" + file_name)
             Change_Name_and_SaveJpeg(file_name);
             app.activeDocument.close(SaveOptions.SAVECHANGES);
         }
@@ -174,6 +197,8 @@ function splitName(inputStr) {
  */
 function Change_Name_and_SaveJpeg(name) {
     var doc = app.activeDocument;
+    // alert("Using Doc: " + doc.name);
+    // alert("Using Path: " + doc.path);
     var file = new File(doc.path + '/' + name + '.jpg');
     result = splitName(name);
     var nameLayer = doc.layers.getByName('Name');
@@ -212,7 +237,7 @@ function Change_Pic(doc, name) {
         doAction('Transform', 'Flyers');
     }
     catch (error) {
-        alert("No Changes Made\n" + error);
+        // alert("No Changes Made\n" + error);
     }
 }
 

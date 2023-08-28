@@ -70,6 +70,11 @@ def convert_to_jpeg_and_rename(folder_path):
             if filename != new_filename or not filename.endswith('.jpeg'):
                 os.remove(img_path)
 
+        # Check if the file starts with "@" and contains "%" and does not end with a 3-4 character extension
+        elif re.search(r'^@.*%.*$', filename) and not re.search(r'\.{3,4}$', filename) and os.path.isfile(os.path.join(folder_path, filename)):
+            new_filename = filename + '.jpeg'
+            os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
+
 def main():
     parser = argparse.ArgumentParser(description="Process JPEGs in a directory.")
     parser.add_argument("-f", "--folder", help="Use default folder path", action="store_true")
@@ -135,12 +140,12 @@ def main():
 
 
 
-    if len(names) == 0:
-        print("No files found. Exiting.")
-        return
-    else:
+    # if len(names) == 0:
+        # print("No files found. Exiting.")
+        # return
+    # else:
         # run the edit_PS.jsx script
-        os.system("open -a 'Adobe Photoshop 2023' ./edit_PS.jsx")
+    os.system("open -a 'Adobe Photoshop 2023' ./edit_PS.jsx")
 
 if __name__ == "__main__":
     main()
