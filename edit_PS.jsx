@@ -175,7 +175,7 @@ function splitName(inputStr) {
 
     // Further process the name to make it human-readable
     var name = splitArr[1].replace(/_/g, ' ') // Replace '_' with ' '
-                          .replace(/-/g, ' ') // Replace '_' with ' '
+                        //   .replace(/-/g, ' ') // Replace '-' with ' '
                           .replace(/\(\d+\)/g, '') // Remove '(1)', '(2)', etc.
                           .replace(/^25/, '') // Remove '25' from the start of the string
                           .replace(/([a-z])([A-Z])/g, '$1 $2') // Add a space between first and last name 
@@ -201,10 +201,18 @@ function Change_Name_and_SaveJpeg(name) {
     // alert("Using Path: " + doc.path);
     var file = new File(doc.path + '/' + name + '.jpg');
     result = splitName(name);
-    var nameLayer = doc.layers.getByName('Name');
-    nameLayer.textItem.contents = result[1];
-    var tagLayer = doc.layers.getByName('@insta');
-    tagLayer.textItem.contents = result[0];
+    // For 'Name' layer
+    try {
+        var nameLayer = doc.layers.getByName('Name');
+        nameLayer.textItem.contents = result[1];
+    } catch (e) {}
+
+    // For '@insta' layer
+    try {
+        var tagLayer = doc.layers.getByName('@insta');
+        tagLayer.textItem.contents = result[0];
+    } catch (e) {}
+
     Change_Pic(doc, name);
     var opts = new JPEGSaveOptions();
     // add options to make the file size smaller
