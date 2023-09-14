@@ -96,7 +96,7 @@ function processPSDFilesInFolder(folderPath) {
     //      var baseName = file.name;  // This gets you just the filename part
     //      baseNames.push(baseName);
     //  }
-     
+
     //  alert("Base names of files: \n" + baseNames.join('\n'));
     /**
      *
@@ -174,14 +174,19 @@ function splitName(inputStr) {
     var instaTag = splitArr[0];
 
     // Further process the name to make it human-readable
-    var name = splitArr[1].replace(/_/g, ' ') // Replace '_' with ' '
-                        //   .replace(/-/g, ' ') // Replace '-' with ' '
-                          .replace(/\(\d+\)/g, '') // Remove '(1)', '(2)', etc.
-                          .replace(/^25/, '') // Remove '25' from the start of the string
-                          .replace(/([a-z])([A-Z])/g, '$1 $2') // Add a space between first and last name 
-                          // Capitalize the first letter of each word
-                          .replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); })
-                          ;
+    var name = splitArr[1]
+        .replace(/_/g, ' ') // Replace '_' with ' '
+        // .replace(/-/g, ' ') // Replace '-' with ' ' (This line is commented out)
+        .replace(/\(\d+\)/g, '') // Remove '(1)', '(2)', etc.
+        .replace(/^25/, '') // Remove '25' from the start of the string
+        .replace(/([a-z])([A-Z])/g, '$1 $2') // Add a space between first and last name 
+        // Capitalize the first letter of each word and after a '-'
+        .replace(/\w\S*/g, function (txt) {
+            return txt.replace(/(^|\-)\w/g, function(letter) {
+                return letter.toUpperCase();
+            });
+        });
+    
 
 
     alert("\ninstaTag: " + instaTag + "\nname: " + name + "\n")
@@ -205,13 +210,13 @@ function Change_Name_and_SaveJpeg(name) {
     try {
         var nameLayer = doc.layers.getByName('Name');
         nameLayer.textItem.contents = result[1];
-    } catch (e) {}
+    } catch (e) { }
 
     // For '@insta' layer
     try {
         var tagLayer = doc.layers.getByName('@insta');
         tagLayer.textItem.contents = result[0];
-    } catch (e) {}
+    } catch (e) { }
 
     Change_Pic(doc, name);
     var opts = new JPEGSaveOptions();
